@@ -6,6 +6,7 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using Discarded.Components;
+using Discarded.Levels;
 
 namespace Discarded
 {
@@ -28,7 +29,7 @@ namespace Discarded
         private RangeWeapon shotgun;
         private MeleeWeapon sword;
 
-        public Player(Game game, Vector2 position)
+        public Player(Game game, Level level, Vector2 position)
         {
             this.game = game;
             Texture2D tex = game.Content.Load<Texture2D>("player");
@@ -41,7 +42,7 @@ namespace Discarded
             pistol = new RangeWeapon(game, "pistol", new Vector2(8, 12), 0.3f, new Vector2(0, 5), 1.2f, TimeSpan.FromSeconds(0.2), Vector2.Zero);
             shotgun = new RangeWeapon(game, "shotgun", new Vector2(10, 11), 0.1f, new Vector2(25, 0), 2f, TimeSpan.FromSeconds(1), Vector2.Zero);
             sword = new MeleeWeapon(game, "sword", new Vector2(12, 72), 45, TimeSpan.FromSeconds(0.2), Vector2.Zero);
-            ((DiscardedGame)game).ColliderObjects.Add(sword);
+            level.ColliderObjects.Add(sword);
 
             weapon = sword;
         }

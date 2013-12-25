@@ -9,6 +9,7 @@ using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using Microsoft.Xna.Framework.Media;
 using Discarded.Components;
+using Discarded.Levels;
 
 namespace Discarded
 {
@@ -19,20 +20,8 @@ namespace Discarded
     {
         GraphicsDeviceManager graphics;
         SpriteBatch spriteBatch;
-        Random random;
 
-        private Player player;
-        private Monster monster;
-        private TimeSpan spawnTimer;
-
-        // Static sprites
-        private GameObject ground;
-        private GameObject selector;
-
-        // Object lists
-        public List<GameObject> ColliderObjects = new List<GameObject>();
-        public List<GameObject> Objects = new List<GameObject>();
-        public List<TerrainLine> Terrain = new List<TerrainLine>();
+        Level level;
 
         public DiscardedGame()
         {
@@ -52,7 +41,8 @@ namespace Discarded
         protected override void Initialize()
         {
             IsMouseVisible = true;
-            random = new Random();
+
+            level = new Level(this);
 
             base.Initialize();
         }
@@ -68,27 +58,7 @@ namespace Discarded
 
             Services.AddService(typeof(SpriteBatch), spriteBatch);
 
-            player = new Player(this, new Vector2(200, 400));
-            //Objects.Add(player);
-
-            Vector2 tp = new Vector2(100, 250);
-            Terrain.Add(new TerrainLine(tp + new Vector2(0, 432), tp + new Vector2(257, 347)));
-            Terrain.Add(new TerrainLine(tp + new Vector2(257, 347), tp + new Vector2(362, 216)));
-            Terrain.Add(new TerrainLine(tp + new Vector2(362, 216), tp + new Vector2(590, 188)));
-            Terrain.Add(new TerrainLine(tp + new Vector2(590, 188), tp + new Vector2(754, 285)));
-            Terrain.Add(new TerrainLine(tp + new Vector2(754, 285), tp + new Vector2(843, 387)));
-            Terrain.Add(new TerrainLine(tp + new Vector2(843, 387), tp + new Vector2(1080, 450)));
-
-            Texture2D groundTex = Content.Load<Texture2D>("terrain");
-            ground = new GameObject();
-            ground.AddComponent(new Transform(ground, tp));
-            ground.AddComponent(new Sprite(ground, spriteBatch, groundTex));
-            ground.AddComponent(new Collider(ground, new Rectangle(0, 0, groundTex.Width, groundTex.Height)));
-            Objects.Add(ground);
-
-            selector = new GameObject();
-            selector.AddComponent(new Transform(selector, new Vector2(100, 100)));
-            selector.AddComponent(new Sprite(selector, spriteBatch, Content.Load<Texture2D>("selector")));
+            level.LoadContent();
         }
 
         /// <summary>
@@ -99,19 +69,7 @@ namespace Discarded
         {
         }
 
-        public void AddBullet(Bullet bullet)
-        {
-            Objects.Add(bullet);
-            ColliderObjects.Add(bullet);
-        }
-
-        // Spawn monsters
-        public void SpawnMonster(Vector2 pos)
-        {
-            monster = new Monster(this, pos);
-            Objects.Add(monster);
-            ColliderObjects.Add(monster);
-        }
+        
 
         /// <summary>
         /// Allows the game to run logic such as updating the world,
@@ -126,57 +84,16 @@ namespace Discarded
                 this.Exit();
             }
 
-            player.Update(gameTime);
-
-            spawnTimer -= gameTime.ElapsedGameTime;
-            if (spawnTimer < TimeSpan.FromSeconds(0))
-            {
-                SpawnMonster(new Vector2(1000, random.Next(200, 400)));
-                spawnTimer = TimeSpan.FromSeconds(3);
-            }
-
-            // Player v Terrain
-            player.Grounded = false;
-            TerrainCollider tc = (TerrainCollider)player.GetComponent<TerrainCollider>();
-            foreach (TerrainLine line in Terrain)
-            {
-                tc.CheckCollision(line);
-            }
-
-
-            foreach (var obj in Objects)
-            {
-                obj.Update(gameTime);
-            }
-
-            for (int i=0; i<ColliderObjects.Count; i++) {
-                GameObject obj = ColliderObjects[i];
-                if (!obj.Collider.Active) continue;
-
-                for (int j=i+1; j<ColliderObjects.Count; j++)
-                {
-                    GameObject other = ColliderObjects[j];
-                    if (!other.Collider.Active) continue;
-                    
-                    if (obj != other)
-                    {
-                        obj.Collider.CheckCollision(other);
-                    }
-                }
-
-                TerrainCollider terrainCollider = (TerrainCollider)obj.GetComponent<TerrainCollider>();
-                if (terrainCollider != null)
-                {
-                    foreach (TerrainLine line in Terrain)
-                    {
-                        terrainCollider.CheckCollision(line);
-                    }
-                }
-            }
-            ColliderObjects.RemoveAll(o => o.Remove);
-            Objects.RemoveAll(o => o.Remove);
+            level.Update(gameTime);
 
             base.Update(gameTime);
+        }
+
+        // Workaround for Level
+        public void AddBullet(Bullet bullet)
+        {
+            level.Objects.Add(bullet);
+            level.ColliderObjects.Add(bullet);
         }
 
         /// <summary>
@@ -187,19 +104,7 @@ namespace Discarded
         {
             GraphicsDevice.Clear(Color.Snow);
 
-            spriteBatch.Begin();
-
-            selector.Draw();
-            //ground.Draw();
-            player.Draw();
-            //monster.Draw();
-
-            foreach (var obj in Objects)
-            {
-                obj.Draw();
-            }
-
-            spriteBatch.End();
+            level.Draw();
 
             base.Draw(gameTime);
         }
