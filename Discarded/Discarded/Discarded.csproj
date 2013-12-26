@@ -117,6 +117,7 @@
     <Compile Include="Components\TerrainCollider.cs" />
     <Compile Include="Components\Transform.cs" />
     <Compile Include="GameObject.cs" />
+    <Compile Include="Levels\Layer.cs" />
     <Compile Include="Levels\Level.cs" />
     <Compile Include="Line.cs" />
     <Compile Include="MeleeWeapon.cs" />

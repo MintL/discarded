@@ -24,10 +24,12 @@ namespace Discarded.Levels
         // Object lists
         public List<GameObject> ColliderObjects = new List<GameObject>();
         public List<GameObject> Objects = new List<GameObject>();
-        public List<GameObject> StaticSprites = new List<GameObject>();
         public List<TerrainLine> Terrain = new List<TerrainLine>();
 
-        protected Vector2 cameraPosition;
+
+        public List<Layer> Layers = new List<Layer>();
+
+        public Vector2 CameraPosition;
         protected int screenWidth;
         protected int screenHeight;
 
@@ -35,7 +37,7 @@ namespace Discarded.Levels
         {
             this.random = new Random();
             this.game = game;
-            this.cameraPosition = Vector2.Zero;
+            this.CameraPosition = Vector2.Zero;
             this.screenWidth = game.GraphicsDevice.Viewport.Width;
             this.screenHeight = game.GraphicsDevice.Viewport.Height;
         }
@@ -54,24 +56,34 @@ namespace Discarded.Levels
             Terrain.Add(new TerrainLine(tp + new Vector2(754, 285), tp + new Vector2(843, 387)));
             Terrain.Add(new TerrainLine(tp + new Vector2(843, 387), tp + new Vector2(1080, 450)));
 
-            Texture2D groundTex = game.Content.Load<Texture2D>("terrain");
-            ground = new GameObject();
-            ground.AddComponent(new Transform(ground, tp));
-            ground.AddComponent(new Sprite(ground, spriteBatch, groundTex));
-            ground.AddComponent(new Collider(ground, new Rectangle(0, 0, groundTex.Width, groundTex.Height)));
-            Objects.Add(ground);
+            Terrain.Add(new TerrainLine(tp + new Vector2(1080, 450), new Vector2(1286, 710)));
+            Terrain.Add(new TerrainLine(new Vector2(1286, 710), new Vector2(1454, 600)));
+            Terrain.Add(new TerrainLine(new Vector2(1454, 600), new Vector2(1616, 515)));
+            Terrain.Add(new TerrainLine(new Vector2(1616, 515), new Vector2(1760, 510)));
 
-            AddStaticSprite(new Vector2(100, 100), "selector");
+            //Texture2D groundTex = game.Content.Load<Texture2D>("terrain");
+            //ground = new GameObject();
+            //ground.AddComponent(new Transform(ground, tp));
+            //ground.AddComponent(new Sprite(ground, spriteBatch, groundTex));
+            //ground.AddComponent(new Collider(ground, new Rectangle(0, 0, groundTex.Width, groundTex.Height)));
+            //Objects.Add(ground);
+
+            // TODO: Add HUD sprites
+            //AddStaticSprite(new Vector2(100, 100), "selector");
+
+            Layer background = new Layer(1, 0.75f, spriteBatch, game.Content);
+            background.AddStaticSprite(tp, "terrain");
+            background.AddStaticSprite(new Vector2(1250, 475), "steps");
+            background.AddStaticSprite(new Vector2(1665, 275), "tree1");
+            background.AddStaticSprite(new Vector2(1401, 375), "tree1");
+            background.AddStaticSprite(new Vector2(1489, 685), "flower1");
+            background.AddStaticSprite(new Vector2(1683, 679), "stone1");
+            background.AddStaticSprite(new Vector2(1475, 585), "fence");
+
+            Layers.Add(background);
         }
 
-        public void AddStaticSprite(Vector2 position, string asset)
-        {
-            GameObject sprite = new GameObject();
-            sprite.AddComponent(new Transform(sprite, position));
-            sprite.AddComponent(new Sprite(sprite, spriteBatch, game.Content.Load<Texture2D>(asset)));
-
-            StaticSprites.Add(sprite);
-        }
+        
 
         // Spawn monsters
         public void SpawnMonster(Vector2 pos)
@@ -86,7 +98,7 @@ namespace Discarded.Levels
             player.Update(gameTime);
 
             // Update camera position to always stay in the middle of screen, centered around the player
-            cameraPosition = player.Transform.Position - Vector2.UnitX * screenWidth / 2;
+            CameraPosition = player.Transform.Position - Vector2.UnitX * screenWidth / 2;
 
             spawnTimer -= gameTime.ElapsedGameTime;
             if (spawnTimer < TimeSpan.FromSeconds(0))
@@ -144,9 +156,14 @@ namespace Discarded.Levels
         public void Draw()
         {
             // Draw everything in relation to the position of the player in the middle of the screen
-            Matrix cameraTransform = Matrix.CreateTranslation(-cameraPosition.X, 0.0f, 0.0f);
+            Matrix cameraTransform = Matrix.CreateTranslation(-CameraPosition.X, 0.0f, 0.0f);
             spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, SamplerState.LinearClamp, DepthStencilState.None, RasterizerState.CullNone, null, cameraTransform);
-            
+
+            foreach (Layer layer in Layers)
+            {
+                layer.Draw();
+            }
+
             player.Draw();   
 
             // Draw every object
@@ -155,11 +172,7 @@ namespace Discarded.Levels
                 obj.Draw();
             }
 
-            // Draw every static sprite
-            foreach (var sprite in StaticSprites)
-            {
-                sprite.Draw();
-            }
+            
 
 
             spriteBatch.End();

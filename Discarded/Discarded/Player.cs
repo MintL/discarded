@@ -13,6 +13,7 @@ namespace Discarded
     public class Player : GameObject
     {
         private Game game;
+        private Level level;
         private KeyboardState keyboard;
         private MouseState mouse;
 
@@ -32,6 +33,7 @@ namespace Discarded
         public Player(Game game, Level level, Vector2 position)
         {
             this.game = game;
+            this.level = level;
             Texture2D tex = game.Content.Load<Texture2D>("player");
             AddComponent(new Transform(this, position));
             AddComponent(new Sprite(this, 
@@ -102,7 +104,7 @@ namespace Discarded
             #endregion
 
             // Flip based on aim
-            Transform.Flipped = mouse.X < Transform.Position.X + Sprite.Texture.Width / 2;
+            Transform.Flipped = mouse.X + level.CameraPosition.X < Transform.Position.X + Sprite.Texture.Width / 2;
 
             // Change weapon
             if (keyboard.IsKeyDown(Keys.D1)) weapon = pistol;
