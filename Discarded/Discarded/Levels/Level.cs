@@ -27,7 +27,9 @@ namespace Discarded.Levels
         public List<TerrainLine> Terrain = new List<TerrainLine>();
 
 
-        public List<Layer> Layers = new List<Layer>();
+        public List<GameObject> StaticSprites = new List<GameObject>();
+        public List<Layer> BackgroundLayers = new List<Layer>();
+        public Layer ForegroundLayer;
 
         SpriteFont font;
 
@@ -73,16 +75,20 @@ namespace Discarded.Levels
             // TODO: Add HUD sprites
             //AddStaticSprite(new Vector2(100, 100), "selector");
 
-            Layer background = new Layer(1, 0.75f, spriteBatch, game.Content);
-            background.AddStaticSprite(tp, "terrain");
-            background.AddStaticSprite(new Vector2(1250, 475), "steps");
-            background.AddStaticSprite(new Vector2(1665, 275), "tree1");
-            background.AddStaticSprite(new Vector2(1401, 375), "tree1");
-            background.AddStaticSprite(new Vector2(1489, 685), "flower1");
-            background.AddStaticSprite(new Vector2(1683, 679), "stone1");
-            background.AddStaticSprite(new Vector2(1475, 585), "fence");
+            
+            AddStaticSprite(tp, "terrain");
+            AddStaticSprite(new Vector2(1250, 475), "steps");
+            AddStaticSprite(new Vector2(1665, 275), "tree1");
+            AddStaticSprite(new Vector2(1401, 375), "tree1");
+            AddStaticSprite(new Vector2(1489, 685), "flower1");
+            AddStaticSprite(new Vector2(1683, 679), "stone1");
+            AddStaticSprite(new Vector2(1475, 585), "fence");
 
-            Layers.Add(background);
+            // Add parallax background layers
+            BackgroundLayers.Add(new Layer(0.8f, spriteBatch, game.Content, "Backgrounds/layer0"));
+            BackgroundLayers.Add(new Layer(0.7f, spriteBatch, game.Content, "Backgrounds/layer1"));
+
+            //ForegroundLayer = new Layer(-0.5f, spriteBatch, game.Content, "Backgrounds/foreground0");
 
             font = game.Content.Load<SpriteFont>("Fonts/mayflower18");
         }
@@ -157,18 +163,32 @@ namespace Discarded.Levels
             Objects.RemoveAll(o => o.Remove);
         }
 
+        public void AddStaticSprite(Vector2 position, string asset)
+        {
+            GameObject sprite = new GameObject();
+            sprite.AddComponent(new Transform(sprite, position));
+            sprite.AddComponent(new Sprite(sprite, spriteBatch, game.Content.Load<Texture2D>("TerrainProps/" + asset)));
+
+            StaticSprites.Add(sprite);
+        }
+
         public void Draw()
         {
             // Draw everything in relation to the position of the player in the middle of the screen
             Matrix cameraTransform = Matrix.CreateTranslation(-CameraPosition.X, 0.0f, 0.0f);
             spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, SamplerState.LinearClamp, DepthStencilState.None, RasterizerState.CullNone, null, cameraTransform);
 
-            foreach (Layer layer in Layers)
+            foreach (Layer layer in BackgroundLayers)
             {
-                layer.Draw();
+                layer.Draw(CameraPosition);
             }
 
-            player.Draw();   
+            foreach (GameObject sprite in StaticSprites)
+            {
+                sprite.Draw();
+            }
+
+              
 
             // Draw every object
             foreach (var obj in Objects)
@@ -176,8 +196,12 @@ namespace Discarded.Levels
                 obj.Draw();
             }
 
-            spriteBatch.DrawString(font, "Welcome adventurer to this quest! Begin your journey by travel east.", new Vector2(200, 50), Color.Black);
+            spriteBatch.DrawString(font, "Adventurer, welcome! Begin your journey by travel east.", new Vector2(200, 50), Color.Black);
 
+
+            player.Draw();
+
+            //ForegroundLayer.Draw(CameraPosition);
 
             spriteBatch.End();
         }

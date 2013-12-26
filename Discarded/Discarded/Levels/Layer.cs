@@ -11,41 +11,25 @@ namespace Discarded.Levels
 {
     public class Layer
     {
-        public int Depth { get; private set; }
-
         public float ScrollRate { get; private set; }
 
-        public List<GameObject> StaticSprites = new List<GameObject>();
 
         private SpriteBatch spriteBatch;
-        private ContentManager content;
+        private Texture2D texture;
 
-        public Layer(int depth, float scrollRate, SpriteBatch spriteBatch, ContentManager content)
+        public Layer(float scrollRate, SpriteBatch spriteBatch, ContentManager content, string basePath)
         {
-            this.Depth = depth;
             this.ScrollRate = scrollRate;
 
             this.spriteBatch = spriteBatch;
-            this.content = content;
+            this.texture = content.Load<Texture2D>(basePath);
         }
 
-        public void AddStaticSprite(Vector2 position, string asset)
+        public void Draw(Vector2 cameraPosition)
         {
-            GameObject sprite = new GameObject();
-            sprite.AddComponent(new Transform(sprite, position));
-            sprite.AddComponent(new Sprite(sprite, spriteBatch, content.Load<Texture2D>("TerrainProps/" + asset)));
-
-            StaticSprites.Add(sprite);
-        }
-
-
-        public void Draw()
-        {
-            // Draw every static background sprite
-            foreach (var sprite in StaticSprites)
-            {
-                sprite.Draw();
-            }
+            Vector2 position = Vector2.UnitX * 300 + cameraPosition * ScrollRate;
+            position.Y = 50;
+            spriteBatch.Draw(texture, position, Color.White);
         }
     }
 }
