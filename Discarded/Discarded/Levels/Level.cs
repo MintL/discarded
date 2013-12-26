@@ -29,6 +29,8 @@ namespace Discarded.Levels
 
         public List<Layer> Layers = new List<Layer>();
 
+        SpriteFont font;
+
         public Vector2 CameraPosition;
         protected int screenWidth;
         protected int screenHeight;
@@ -81,6 +83,8 @@ namespace Discarded.Levels
             background.AddStaticSprite(new Vector2(1475, 585), "fence");
 
             Layers.Add(background);
+
+            font = game.Content.Load<SpriteFont>("Fonts/mayflower18");
         }
 
         
@@ -172,7 +176,7 @@ namespace Discarded.Levels
                 obj.Draw();
             }
 
-            
+            spriteBatch.DrawString(font, "Welcome adventurer to this quest! Begin your journey by travel east.", new Vector2(200, 50), Color.Black);
 
 
             spriteBatch.End();
