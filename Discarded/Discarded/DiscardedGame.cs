@@ -43,6 +43,7 @@ namespace Discarded
             IsMouseVisible = true;
 
             level = new Level(this);
+            Services.AddService(typeof(Level), level);
 
             base.Initialize();
         }

@@ -5,14 +5,17 @@ using System.Text;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Discarded.Components;
+using Discarded.Levels;
 
 namespace Discarded
 {
     public class Bullet : GameObject
     {
         private Game game;
+        private Level level;
         private Vector2 direction;
         private float speed = 1.2f;
+        private Rectangle screen;
 
         public Bullet(Game game, Vector2 direction, Vector2 position, float speed)
             : base("Bullet")
@@ -20,6 +23,9 @@ namespace Discarded
             this.game = game;
             this.direction = direction;
             this.speed = speed;
+            this.level = (Level)game.Services.GetService(typeof(Level));
+
+            screen = new Rectangle((int)position.X - level.ScreenWidth / 2, 0, game.GraphicsDevice.Viewport.Width, game.GraphicsDevice.Viewport.Height);
 
             AddComponent(new Transform(this, position));
             AddComponent(new Sprite(this,
@@ -31,7 +37,7 @@ namespace Discarded
         public override void Update(GameTime gameTime)
         {
             Transform.Position += direction * speed * gameTime.ElapsedGameTime.Milliseconds;
-            Rectangle screen = new Rectangle(0, 0, game.GraphicsDevice.Viewport.Width, game.GraphicsDevice.Viewport.Height);
+            
             if (!Collider.Bounds.Intersects(screen))
             {
                 Remove = true;

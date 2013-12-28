@@ -6,6 +6,7 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using Discarded.Components;
+using Discarded.Levels;
 
 namespace Discarded
 {
@@ -14,6 +15,7 @@ namespace Discarded
         private Vector2 bulletOffset;
         private float bulletSpeed;
         private Vector2 aimDirection;
+        private Level level;
 
         public RangeWeapon(Game game, string asset, Vector2 originalCenter, float offsetRotation, 
                 Vector2 bulletOffset, float bulletSpeed, TimeSpan reloadTime, Vector2 position)
@@ -21,6 +23,7 @@ namespace Discarded
         {
             this.bulletOffset = bulletOffset;
             this.bulletSpeed = bulletSpeed;
+            this.level = (Level)game.Services.GetService(typeof(Level)); 
         }
 
         public override void Update(Vector2 pos, bool flipped, GameTime gameTime)
@@ -28,7 +31,7 @@ namespace Discarded
             base.Update(pos, flipped, gameTime);
 
             MouseState mouse = Mouse.GetState();
-            aimDirection = new Vector2(mouse.X, mouse.Y) - pos;
+            aimDirection = new Vector2(mouse.X, mouse.Y) + Vector2.UnitX * level.CameraPosition.X - pos;
 
             // Aiming
             Transform.Rotation = (float)Math.Acos(aimDirection.X / aimDirection.Length());

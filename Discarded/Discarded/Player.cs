@@ -30,10 +30,10 @@ namespace Discarded
         private RangeWeapon shotgun;
         private MeleeWeapon sword;
 
-        public Player(Game game, Level level, Vector2 position)
+        public Player(Game game, Vector2 position)
         {
             this.game = game;
-            this.level = level;
+            this.level = (Level)game.Services.GetService(typeof(Level));
             Texture2D tex = game.Content.Load<Texture2D>("player");
             AddComponent(new Transform(this, position));
             AddComponent(new Sprite(this, 

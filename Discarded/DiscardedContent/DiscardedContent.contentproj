@@ -148,22 +148,22 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Backgrounds\layer1.png">
-      <Name>layer1</Name>
+    <Compile Include="Layers\back1.png">
+      <Name>back1</Name>
       <Importer>TextureImporter</Importer>
       <Processor>TextureProcessor</Processor>
     </Compile>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Backgrounds\layer0.png">
-      <Name>layer0</Name>
+    <Compile Include="Layers\back0.png">
+      <Name>back0</Name>
       <Importer>TextureImporter</Importer>
       <Processor>TextureProcessor</Processor>
     </Compile>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Backgrounds\foreground0.png">
-      <Name>foreground0</Name>
+    <Compile Include="Layers\fore0.png">
+      <Name>fore0</Name>
       <Importer>TextureImporter</Importer>
       <Processor>TextureProcessor</Processor>
     </Compile>

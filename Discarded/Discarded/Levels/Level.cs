@@ -34,23 +34,23 @@ namespace Discarded.Levels
         SpriteFont font;
 
         public Vector2 CameraPosition;
-        protected int screenWidth;
-        protected int screenHeight;
+        public int ScreenWidth;
+        public int ScreenHeight;
 
         public Level(Game game)
         {
             this.random = new Random();
             this.game = game;
             this.CameraPosition = Vector2.Zero;
-            this.screenWidth = game.GraphicsDevice.Viewport.Width;
-            this.screenHeight = game.GraphicsDevice.Viewport.Height;
+            this.ScreenWidth = game.GraphicsDevice.Viewport.Width;
+            this.ScreenHeight = game.GraphicsDevice.Viewport.Height;
         }
 
         public void LoadContent()
         {
             this.spriteBatch = (SpriteBatch)game.Services.GetService(typeof(SpriteBatch));
 
-            player = new Player(game, this, new Vector2(200, 400));
+            player = new Player(game, new Vector2(200, 400));
 
             Vector2 tp = new Vector2(100, 250);
             Terrain.Add(new TerrainLine(tp + new Vector2(0, 432), tp + new Vector2(257, 347)));
@@ -85,10 +85,10 @@ namespace Discarded.Levels
             AddStaticSprite(new Vector2(1475, 585), "fence");
 
             // Add parallax background layers
-            BackgroundLayers.Add(new Layer(0.8f, spriteBatch, game.Content, "Backgrounds/layer0"));
-            BackgroundLayers.Add(new Layer(0.7f, spriteBatch, game.Content, "Backgrounds/layer1"));
+            BackgroundLayers.Add(new Layer(0.8f, spriteBatch, game.Content, "Layers/back0"));
+            BackgroundLayers.Add(new Layer(0.7f, spriteBatch, game.Content, "Layers/back1"));
 
-            //ForegroundLayer = new Layer(-0.5f, spriteBatch, game.Content, "Backgrounds/foreground0");
+            //ForegroundLayer = new Layer(-0.5f, spriteBatch, game.Content, "Layers/fore0");
 
             font = game.Content.Load<SpriteFont>("Fonts/mayflower18");
         }
@@ -108,7 +108,7 @@ namespace Discarded.Levels
             player.Update(gameTime);
 
             // Update camera position to always stay in the middle of screen, centered around the player
-            CameraPosition = player.Transform.Position - Vector2.UnitX * screenWidth / 2;
+            CameraPosition = player.Transform.Position - Vector2.UnitX * ScreenWidth / 2;
 
             spawnTimer -= gameTime.ElapsedGameTime;
             if (spawnTimer < TimeSpan.FromSeconds(0))
@@ -187,8 +187,6 @@ namespace Discarded.Levels
             {
                 sprite.Draw();
             }
-
-              
 
             // Draw every object
             foreach (var obj in Objects)
